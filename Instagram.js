@@ -69,7 +69,7 @@ export default class Instagram extends Component {
   render() {
     const { clientId, redirectUrl, scopes } = this.props
     const { webViewHeight } = this.state
-    const webViewStyle = webViewHeight ? { height: webViewHeight } : {}
+    const webViewStyle = { height: webViewHeight || 0 }
     return (
       <Modal
         animationType={'slide'}
@@ -91,14 +91,13 @@ export default class Instagram extends Component {
                 onMessage={this._onMessage.bind(this)}
                 ref={(webView) => { this.webView = webView }}
               />
-              <TouchableOpacity onPress={this.hide.bind(this)} style={[styles.btnStyle, this.props.styles.btnStyle]}>
+              {webViewHeight && <TouchableOpacity onPress={this.hide.bind(this)} style={[styles.btnStyle, this.props.styles.btnStyle]}>
                 <Image source={require('./close.png')} style={[styles.closeStyle, this.props.styles.closeStyle]} />
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
           </KeyboardAvoidingView>
         </View>
-
-      </Modal >
+      </Modal>
 
     )
   }
