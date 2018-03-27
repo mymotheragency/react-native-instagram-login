@@ -17,30 +17,30 @@ import qs from 'qs'
 const { width, height } = Dimensions.get('window')
 
 export default class Instagram extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = { modalVisible: false }
   }
 
-  show () {
+  show() {
     this.setState({ modalVisible: true })
   }
 
-  hide () {
+  hide() {
     this.setState({ modalVisible: false })
   }
 
-  _onNavigationStateChange (webViewState) {
+  _onNavigationStateChange(webViewState) {
     const { url } = webViewState
     if (url && url.startsWith(this.props.redirectUrl)) {
       const match = url.match(/(#|\?)(.*)/)
       const results = qs.parse(match[2])
       this.hide()
       if (results.access_token) {
-          // Keeping this to keep it backwards compatible, but also returning raw results to account for future changes.
-          this.props.onLoginSuccess(results.access_token, results)
+        // Keeping this to keep it backwards compatible, but also returning raw results to account for future changes.
+        this.props.onLoginSuccess(results.access_token, results)
       } else {
-          this.props.onLoginFailure(results)
+        this.props.onLoginFailure(results)
       }
     }
   }
@@ -55,12 +55,12 @@ export default class Instagram extends Component {
       }catch(err) {}
   }
 
-  _onLoadEnd () {
       const scriptToPostBody = "window.postMessage(document.body.innerText, '*')";
       this.webView.injectJavaScript(scriptToPostBody);
+  _onLoadEnd() {
   }
 
-  render () {
+  render() {
     const { clientId, redirectUrl, scopes } = this.props
     return (
       <Modal
@@ -81,7 +81,7 @@ export default class Instagram extends Component {
                 onError={this._onNavigationStateChange.bind(this)}
                 onLoadEnd={this._onLoadEnd.bind(this)}
                 onMessage={this._onMessage.bind(this)}
-                ref={(webView) => {this.webView=webView}}
+                ref={(webView) => { this.webView = webView }}
               />
               <TouchableOpacity onPress={this.hide.bind(this)} style={[styles.btnStyle, this.props.styles.btnStyle]}>
                 <Image source={require('./close.png')} style={[styles.closeStyle, this.props.styles.closeStyle]} />
