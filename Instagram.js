@@ -45,23 +45,31 @@ export default class Instagram extends Component {
     }
   }
 
-  _onMessage (reactMessage) {
-      try {
-          const json = JSON.parse(reactMessage.nativeEvent.data)
-          if (json && json.error_type) {
-              this.hide()
-              this.props.onLoginFailure(json)
-          }
-      }catch(err) {}
+  _onMessage(reactMessage) {
+    try {
+      const object = reactMessage.nativeEvent.data
+      const { json, height } = JSON.parse(reactMessage.nativeEvent.data)
+      if (height > 0) {
+        this.setState({ webViewHeight: height })
+      }
+      if (json && json.error_type) {
+        this.hide()
+        this.props.onLoginFailure(json)
+      }
+    } catch (error) {
+      console.log("Error:", error)
+    }
   }
 
-      const scriptToPostBody = "window.postMessage(document.body.innerText, '*')";
-      this.webView.injectJavaScript(scriptToPostBody);
   _onLoadEnd() {
+    const scriptToPostBody = `window.postMessage(JSON.stringify({height:document.body.scrollHeight, json:document.body.innerText}), '*')`;
+    this.webView.injectJavaScript(scriptToPostBody);
   }
 
   render() {
     const { clientId, redirectUrl, scopes } = this.props
+    const { webViewHeight } = this.state
+    const webViewStyle = webViewHeight ? { height: webViewHeight } : {}
     return (
       <Modal
         animationType={'slide'}
@@ -71,7 +79,7 @@ export default class Instagram extends Component {
       >
         <View style={[styles.modalWarp, this.props.styles.modalWarp]}>
           <KeyboardAvoidingView behavior='padding' style={[styles.keyboardStyle, this.props.styles.keyboardStyle]}>
-            <View style={[styles.contentWarp, this.props.styles.contentWarp]}>
+            <View style={[styles.contentWarp, this.props.styles.contentWarp, webViewStyle]}>
               <WebView
                 style={[styles.webView, this.props.styles.webView]}
                 source={{ uri: `https://api.instagram.com/oauth/authorize/?client_id=${clientId}&redirect_uri=${redirectUrl}&response_type=token&scope=${scopes.join('+')}` }}
@@ -136,7 +144,8 @@ const styles = StyleSheet.create({
   },
   keyboardStyle: {
     flex: 1,
-    paddingTop: 30
+    paddingTop: 30,
+    justifyContent: "center",
   },
   contentWarp: {
     backgroundColor: '#fff',
