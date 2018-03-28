@@ -60,7 +60,13 @@ export default class Instagram extends Component {
       console.log("Error:", error)
     }
   }
-
+  _onCancel = () => {
+    this.hide()
+    const { onCancel } = this.props
+    if (onCancel) {
+      onCancel()
+    }
+  }
   _onLoadEnd() {
     const scriptToPostBody = `window.postMessage(JSON.stringify({height:document.body.scrollHeight, json:document.body.innerText}), '*')`;
     this.webView.injectJavaScript(scriptToPostBody);
@@ -91,7 +97,7 @@ export default class Instagram extends Component {
                 onMessage={this._onMessage.bind(this)}
                 ref={(webView) => { this.webView = webView }}
               />
-              {webViewHeight && <TouchableOpacity onPress={this.hide.bind(this)} style={[styles.btnStyle, this.props.styles.btnStyle]}>
+              {webViewHeight && <TouchableOpacity onPress={this._onCancel} style={[styles.btnStyle, this.props.styles.btnStyle]}>
                 <Image source={require('./close.png')} style={[styles.closeStyle, this.props.styles.closeStyle]} />
               </TouchableOpacity>}
             </View>
